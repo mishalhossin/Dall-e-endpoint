@@ -47,7 +47,7 @@ def get_key():
 
 def generate_image(prompt):
     openai.api_key = get_key()
-
+    print(f"Generating : {prompt}")
     try:
         response = openai.Image.create(
             prompt=prompt,
