@@ -6,39 +6,10 @@ from flask import Flask, request, jsonify
 import requests
 import random
 
+num_keys = 30
 env_variable_names = [
-  "OPENAI_API_KEY_1",
-  "OPENAI_API_KEY_2",
-  "OPENAI_API_KEY_3",
-  "OPENAI_API_KEY_4",
-  "OPENAI_API_KEY_5",
-  "OPENAI_API_KEY_6",
-  "OPENAI_API_KEY_7",
-  "OPENAI_API_KEY_8",
-  "OPENAI_API_KEY_9",
-  "OPENAI_API_KEY_10",
-  "OPENAI_API_KEY_11",
-  "OPENAI_API_KEY_12",
-  "OPENAI_API_KEY_13",
-  "OPENAI_API_KEY_14",
-  "OPENAI_API_KEY_15",
-  "OPENAI_API_KEY_16",
-  "OPENAI_API_KEY_17",
-  "OPENAI_API_KEY_18",
-  "OPENAI_API_KEY_19",
-  "OPENAI_API_KEY_20",
-  "OPENAI_API_KEY_21",
-  "OPENAI_API_KEY_22",
-  "OPENAI_API_KEY_23",
-  "OPENAI_API_KEY_24",
-  "OPENAI_API_KEY_25",
-  "OPENAI_API_KEY_26",
-  "OPENAI_API_KEY_27",
-  "OPENAI_API_KEY_28",
-  "OPENAI_API_KEY_29",
-  "OPENAI_API_KEY_30"
+    f"OPENAI_API_KEY_{i}" for i in range(1, num_keys + 1)
 ]
-
 
 def get_key():
     selected_variable_name = random.choice(env_variable_names)
@@ -47,7 +18,7 @@ def get_key():
 
 def generate_image(prompt):
     openai.api_key = get_key()
-    print(f"Generating : {prompt}")
+    print(f"Generating: {prompt}")
     try:
         response = openai.Image.create(
             prompt=prompt,
@@ -65,6 +36,10 @@ def generate_image(prompt):
     return image_url
 
 app = Flask(__name__)
+app.logger.setLevel(logging.WARNING)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
+log.addHandler(logging.NullHandler())
 
 @app.route('/', methods=['POST'])
 def handle_post():
