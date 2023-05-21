@@ -1,6 +1,6 @@
-# Dall-e-endpoint
+# Dalle-GPT3-endpoint
 
-This repository contains a Flask application that generates images based on prompts using the OpenAI Image API. The application accepts HTTP POST requests with a JSON payload containing a prompt. It then generates an image based on the prompt and returns the image URL in the response.
+This repository contains a Flask application that generates images and text based on prompts using the OpenAI API. The application accepts HTTP POST requests with a JSON payload containing a prompt. It then generates an image based on the prompt and returns the image URL in the response.
 
 ## Getting Started
 
