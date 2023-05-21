@@ -10,7 +10,6 @@ num_keys = 30
 env_variable_names = [
     f"OPENAI_API_KEY_{i}" for i in range(1, num_keys + 1)
 ]
-
 def get_key():
     selected_variable_name = random.choice(env_variable_names)
     api_key = os.getenv(selected_variable_name)
@@ -18,11 +17,11 @@ def get_key():
 
 def generate_image(prompt):
     openai.api_key = get_key()
-    print(f"Generating: {prompt}")
+    print(f"Generating image: {prompt}")
     try:
         response = openai.Image.create(
             prompt=prompt,
-            n=4,
+            n=10,
             size="1024x1024"
         )
         image_url = response['data'][0]['url']
@@ -35,19 +34,68 @@ def generate_image(prompt):
 
     return image_url
 
+def generate_response(prompt):
+    openai.api_key = get_key()
+    print(f"Generating response: {prompt}")
+    retries = 3
+    attempt = 1
+    while attempt <= retries:
+        try:
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt,
+                temperature=0.5,
+                max_tokens=2000,
+                top_p=1,
+                frequency_penalty=0.5,
+                presence_penalty=0
+            )
+            generated_text = response.choices[0].text.strip()
+            return generated_text
+        except openai.error.AuthenticationError as e:
+            print(f"Authentication error: {e}")
+            if "Incorrect API key" in str(e):
+                print("Retrying with a different API key...")
+                openai.api_key = get_key()
+            else:
+                generated_text = "An error occurred while generating the response."
+                return generated_text
+        except openai.error.InvalidRequestError as e:
+            print(f"Invalid request error: {e}")
+            generated_text = "An error occurred while generating the response."
+            return generated_text
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            generated_text = "An error occurred while generating the response."
+            return generated_text
+        attempt += 1
+
+    generated_text = "Failed to generate response after multiple attempts."
+    return generated_text
+
 app = Flask(__name__)
 app.logger.setLevel(logging.WARNING)
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 log.addHandler(logging.NullHandler())
 
-@app.route('/', methods=['POST'])
-def handle_post():
+@app.route('/image', methods=['POST'])
+def handle_image_post():
     data = request.get_json()
     prompt = data.get('prompt')
     if prompt:
         image_url = generate_image(prompt)
         response = {'image_url': image_url}
+        return jsonify(response), 200
+    return jsonify({'error': 'Invalid request'}), 400
+
+@app.route('/text', methods=['POST'])
+def handle_text_post():
+    data = request.get_json()
+    prompt = data.get('prompt')
+    if prompt:
+        generated_text = generate_response(prompt)
+        response = {'generated_text': generated_text}
         return jsonify(response), 200
     return jsonify({'error': 'Invalid request'}), 400
 
