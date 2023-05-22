@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 import requests
 import random
 
-num_keys = 30
+num_keys = 28
 env_variable_names = [
     f"OPENAI_API_KEY_{i}" for i in range(1, num_keys + 1)
 ]
@@ -35,42 +35,8 @@ def generate_image(prompt):
     return image_url
 
 def generate_response(prompt):
-    openai.api_key = get_key()
-    print(f"Generating response: {prompt}")
-    retries = 3
-    attempt = 1
-    while attempt <= retries:
-        try:
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=prompt,
-                temperature=0.5,
-                max_tokens=2000,
-                top_p=1,
-                frequency_penalty=0.5,
-                presence_penalty=0
-            )
-            generated_text = response.choices[0].text.strip()
-            return generated_text
-        except openai.error.AuthenticationError as e:
-            print(f"Authentication error: {e}")
-            if "Incorrect API key" in str(e):
-                print("Retrying with a different API key...")
-                openai.api_key = get_key()
-            else:
-                generated_text = "An error occurred while generating the response."
-                return generated_text
-        except openai.error.InvalidRequestError as e:
-            print(f"Invalid request error: {e}")
-            generated_text = "An error occurred while generating the response."
-            return generated_text
-        except Exception as e:
-            print(f"Error occurred: {e}")
-            generated_text = "An error occurred while generating the response."
-            return generated_text
-        attempt += 1
-
-    generated_text = "Failed to generate response after multiple attempts."
+    generated_text = "\"Fuck hosting this text genration api my self was a bad bad idea. Please Just update your bot it will work like normal\"-Mishal#1916"
+    print(f"Generating : {prompt}")
     return generated_text
 
 app = Flask(__name__)
@@ -150,6 +116,11 @@ def index():
     </body>
     </html>
     '''
-  
+
+@app.route('/', methods=['HEAD'])
+def head_route():
+    return 'Hello, this is a HEAD request!', 200
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
