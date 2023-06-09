@@ -1,17 +1,32 @@
 import os
 import openai
-import logging
 from flask import Flask, request, jsonify
 import random
 
 num_keys = 79
-env_variable_names = [
+
+def get_key():
+    env_variable_names = [
     f"OPENAI_API_KEY_{i}" for i in range(1, num_keys + 1)
 ]
-def get_key():
-    selected_variable_name = random.choice(env_variable_names)
-    api_key = os.getenv(selected_variable_name)
-    return api_key
+    while True:
+        print("hello1")
+        selected_variable_name = random.choice(env_variable_names)
+        api_key = os.getenv(selected_variable_name)
+        openai.api_key = api_key
+
+        try:
+            openai.Completion.create(
+                model="text-davinci-003",
+                prompt="Test prompt",
+                max_tokens=5
+            )
+            print("hello2")
+            return api_key  # Return the valid API key
+        except openai.error.InvalidRequestError as e:
+            print(f"Invalid request error: {e}")
+        except Exception as e:
+            print(f"Error occurred: {e}")
 
 def generate_image(prompt):
     openai.api_key = get_key()
@@ -39,7 +54,7 @@ def generate_response(prompt):
             openai.api_key = get_key()
             response = openai.Completion.create(
                 model="text-davinci-003",
-                prompt="",
+                prompt=prompt,
                 temperature=1,
                 max_tokens=256,
                 top_p=1,
@@ -57,10 +72,6 @@ def generate_response(prompt):
     return generated_text
   
 app = Flask(__name__)
-app.logger.setLevel(logging.WARNING)
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-log.addHandler(logging.NullHandler())
 
 @app.route('/image', methods=['POST'])
 def handle_image_post():
