@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify
 import requests
 import random
 
-num_keys = 28
+num_keys = 79
 env_variable_names = [
     f"OPENAI_API_KEY_{i}" for i in range(1, num_keys + 1)
 ]
@@ -35,8 +35,26 @@ def generate_image(prompt):
     return image_url
 
 def generate_response(prompt):
-    generated_text = "\"Fuck hosting this text genration api my self was a bad bad idea. Please Just update your bot it will work like normal\"-Mishal#1916"
-    print(f"Generating : {prompt}")
+    openai.api_key = get_key()
+    print(f"Generating response: {prompt}")
+    try:
+        response = openai.Completion.create(
+          model="text-davinci-003",
+          prompt="",
+          temperature=1,
+          max_tokens=256,
+          top_p=1,
+          frequency_penalty=0,
+          presence_penalty=0
+        )
+        generated_text = response.choices[0].text.strip()
+    except openai.error.InvalidRequestError as e:
+        print(f"Invalid request error: {e}")
+        generated_text = "An error occurred while generating the response."
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        generated_text = "An error occurred while generating the response."
+
     return generated_text
 
 app = Flask(__name__)
