@@ -1,10 +1,7 @@
 import os
-from datetime import datetime
 import openai
 import logging
-from retry import retry
 from flask import Flask, request, jsonify
-import requests
 import random
 
 num_keys = 79
@@ -58,6 +55,7 @@ def generate_response(prompt):
             print(f"Error occurred: {e}")
 
     return generated_text
+  
 app = Flask(__name__)
 app.logger.setLevel(logging.WARNING)
 log = logging.getLogger('werkzeug')
@@ -92,7 +90,7 @@ def index():
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Centered Rounded Box with Header and Shadow</title>
+    <titleEndpoint</title>
     <style>
       body {
         background-color: #333;
