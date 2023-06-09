@@ -26,3 +26,6 @@ OPENAI_API_KEY_30=
 ```
 main.py
 ```
+
+
+For keys use https://github.com/ading2210/openai-key-scraper
