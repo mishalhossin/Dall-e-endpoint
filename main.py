@@ -2,6 +2,7 @@ import os
 from datetime import datetime
 import openai
 import logging
+from retry import retry
 from flask import Flask, request, jsonify
 import requests
 import random
@@ -33,30 +34,30 @@ def generate_image(prompt):
         image_url = "https://cdn.discordapp.com/attachments/1025493152301326356/1109446996449820794/ai.png"
 
     return image_url
-
+  
 def generate_response(prompt):
-    openai.api_key = get_key()
     print(f"Generating response: {prompt}")
-    try:
-        response = openai.Completion.create(
-          model="text-davinci-003",
-          prompt="",
-          temperature=1,
-          max_tokens=256,
-          top_p=1,
-          frequency_penalty=0,
-          presence_penalty=0
-        )
-        generated_text = response.choices[0].text.strip()
-    except openai.error.InvalidRequestError as e:
-        print(f"Invalid request error: {e}")
-        generated_text = "An error occurred while generating the response."
-    except Exception as e:
-        print(f"Error occurred: {e}")
-        generated_text = "An error occurred while generating the response."
+    while True:
+        try:
+            openai.api_key = get_key()
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt="",
+                temperature=1,
+                max_tokens=256,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0
+            )
+            generated_text = response.choices[0].text.strip()
+            break
+          
+        except openai.error.InvalidRequestError as e:
+            print(f"Invalid request error: {e}")
+        except Exception as e:
+            print(f"Error occurred: {e}")
 
     return generated_text
-
 app = Flask(__name__)
 app.logger.setLevel(logging.WARNING)
 log = logging.getLogger('werkzeug')
