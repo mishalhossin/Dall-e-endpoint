@@ -25,6 +25,6 @@ User: Hi there?
 Bot:
 """
 
-response = await asyncio.to_thread(generate_response(prompt))
+response = asyncio.run(generate_response(prompt))
 
 print (response)
